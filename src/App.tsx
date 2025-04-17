@@ -1,11 +1,11 @@
-import { Button } from "./components/ui/button"
+import ChatLayout from "./chat/layout/ChatLayout"
+import ChatPage from "./chat/pages/ChatPages"
 
 function App() {
     return (
-        <>
-            <h1 className="text-3x1 font-bold underline">Hola Mundo</h1>
-            <Button variant="default">Click me</Button>
-        </>
+        <ChatLayout >
+            <ChatPage />
+        </ChatLayout>
     )
 }
 
