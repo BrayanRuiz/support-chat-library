@@ -1,11 +1,9 @@
-import ChatLayout from "./chat/layout/ChatLayout"
-import ChatPage from "./chat/pages/ChatPages"
+import { AppRouter } from "./AppRouter"
+
 
 function App() {
     return (
-        <ChatLayout >
-            <ChatPage />
-        </ChatLayout>
+        <AppRouter />
     )
 }
 
