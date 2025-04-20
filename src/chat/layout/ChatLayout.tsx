@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { X } from "lucide-react"
-import { Outlet } from "react-router"
+import { NavLink, Outlet } from "react-router"
 
 export default function ChatLayout() {
     return (
@@ -25,18 +25,18 @@ export default function ChatLayout() {
                                     </div>
                                     G5 Customer
                                 </Button>
-                                <Button variant="ghost" className="w-full justify-start">
+                                <NavLink to="/chat/1" className="w-full flex items-center justify-start">
                                     <div className="h-6 w-6 rounded-full bg-green-500 mr-2 flex-shrink-0 flex items-center justify-center text-white text-xs">
                                         JD
                                     </div>
                                     John Doe
-                                </Button>
-                                <Button variant="ghost" className="w-full justify-start">
+                                </NavLink>
+                                <NavLink to="/chat/2" className="w-full flex items-center justify-start">
                                     <div className="h-6 w-6 rounded-full bg-purple-500 mr-2 flex-shrink-0 flex items-center justify-center text-white text-xs">
                                         AS
                                     </div>
                                     Alice Smith
-                                </Button>
+                                </NavLink>
                                 <Button variant="ghost" className="w-full justify-start">
                                     <div className="h-6 w-6 rounded-full bg-yellow-500 mr-2 flex-shrink-0 flex items-center justify-center text-white text-xs">
                                         RJ
