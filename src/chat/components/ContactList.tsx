@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router'
+import { NavLink, useParams } from 'react-router'
 
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -7,6 +7,9 @@ import { useQuery } from '@tanstack/react-query';
 import { getClients } from '@/fake-data';
 
 const ContactList = () => {
+
+    const { clientId } = useParams();
+
     const { data: clients, isLoading } = useQuery({
         queryKey: ['clients'],
         queryFn: () => getClients(),
@@ -25,17 +28,30 @@ const ContactList = () => {
                         )}
                         {
                             clients?.map((client) => (
-                                <NavLink key={client.id} 
-                                to={`/chat/${client.id}`} 
-                                className={({ isActive }) => `w-full flex items-center justify-start mt-3 transition-all duration-300
-                                ${isActive 
-                                    ? 'bg-primary/10 text-primary font-medium rounded-md' 
-                                    : 'hover:bg-muted/50 rounded-md'}`}
+                                <NavLink
+                                    key={client.id}
+                                    to={`/chat/${client.id}`}
+                                    className={({ isActive }) => `w-full flex items-center justify-start mt-3 transition-all duration-300
+                                ${isActive
+                                            ? 'bg-primary/10 text-primary font-medium rounded-md'
+                                            : 'hover:bg-muted/80 rounded-md'}`}
                                 >
-                                    <div className="h-6 w-6 rounded-full bg-gray-300 mr-2 flex-shrink-0 flex items-center justify-center text-white text-xs">
+                                    <div
+                                        className={`h-6 w-6 rounded-full mr-2 flex-shrink-0 flex items-center justify-center text-xs 
+                                                ${clientId === client.id
+                                                ? 'bg-blue-300 text-blue-600 font-medium'
+                                                : 'bg-gray-300'
+                                            }`}
+                                    >
                                         {client.name.charAt(0)}
+                                        {client.name.charAt(1)}
                                     </div>
-                                    <span className='text-gray-600'>{client.name}</span>
+                                    <span className={`transition-all duration-300 ${clientId === client.id
+                                            ? 'text-blue-600 font-medium'
+                                            : 'text-gray-600'
+                                        }`}>
+                                        {client.name}
+                                    </span>
                                 </NavLink>
                             ))
                         }
