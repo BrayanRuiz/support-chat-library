@@ -1,11 +1,16 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
-
-import AuthLayout from "./auth/layout/AuthLayout";
-import { RegisterPage } from "./auth/pages/RegisterPage";
-import { LoginPage } from "./auth/pages/LoginPage";
-import { sleep } from "./lib/sleep";
 import PrivateRoute from "./auth/components/PrivateRoute";
+
+import { AuthLayout } from "./auth/layout/AuthLayout";
+import { LoginPage } from "./auth/pages/LoginPage";
+import { RegisterPage } from "./auth/pages/RegisterPage";
+
+import { sleep } from "./lib/sleep";
+import { useQuery } from "@tanstack/react-query";
+import { checkAuth } from "./fake-data";
+
+import Loading from "./components/ui/loading";
 
 // Lazy Load
 const ChatLayout = lazy(async () => {
@@ -17,6 +22,24 @@ const ChatPage = lazy(async () => import("./chat/pages/ChatPages"));
 const NoChatSelectedPage = lazy(async () => import("./chat/pages/NoChatSelectedPage"));
 
 export const AppRouter = () => {
+
+    const { data: user, isLoading, isError, error } = useQuery({
+        queryKey: ['user'],
+        queryFn: () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No token found');
+            }
+
+            return checkAuth(token);
+        },
+        retry: 0,
+    });
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <BrowserRouter>
             <Routes>
@@ -33,7 +56,7 @@ export const AppRouter = () => {
                             <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
                         </div>
                     }>
-                        <PrivateRoute isAuthenticated={false}>
+                        <PrivateRoute isAuthenticated={!!user}>
                             <ChatLayout />
                         </PrivateRoute>
                     </Suspense>
