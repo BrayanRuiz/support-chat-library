@@ -14,7 +14,7 @@ import Loading from "./components/ui/loading";
 
 // Lazy Load
 const ChatLayout = lazy(async () => {
-    await sleep(1500); 
+    await sleep(1500);
     return import("./chat/layout/ChatLayout");
 });
 
@@ -23,7 +23,7 @@ const NoChatSelectedPage = lazy(async () => import("./chat/pages/NoChatSelectedP
 
 export const AppRouter = () => {
 
-    const { data: user, isLoading, isError, error } = useQuery({
+    const { data: user, isLoading } = useQuery({
         queryKey: ['user'],
         queryFn: () => {
             const token = localStorage.getItem('token');
@@ -44,8 +44,8 @@ export const AppRouter = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/auth" element={<AuthLayout />}>
-                    <Route index element={<LoginPage />}/>
-                    <Route path="/auth/register" element={<RegisterPage />}/>
+                    <Route index element={<LoginPage />} />
+                    <Route path="/auth/register" element={<RegisterPage />} />
                     {/* <Route path="/auth" element={<Navigate to="/auth/login" />} /> */}
                 </Route>
 
@@ -61,10 +61,18 @@ export const AppRouter = () => {
                         </PrivateRoute>
                     </Suspense>
                 }>
-                    <Route index element={<NoChatSelectedPage />} />
-                    <Route path="/chat/:clientId" element={<ChatPage />} />
+                    <Route index element={
+                        <PrivateRoute isAuthenticated={!!user}>
+                            <NoChatSelectedPage />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/chat/:clientId" element={
+                        <PrivateRoute isAuthenticated={!!user}>
+                            <ChatPage />
+                        </PrivateRoute>
+                    } />
                 </Route>
-                
+
                 <Route path="/" element={<Navigate to="/auth" />} />
                 <Route path="*" element={<Navigate to="/auth" />} />
             </Routes>

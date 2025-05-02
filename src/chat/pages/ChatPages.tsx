@@ -2,24 +2,48 @@
 
 import { useState } from "react"
 import { useParams } from "react-router"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { Copy, Download, ThumbsUp, ThumbsDown, Send, MessageSquare } from "lucide-react"
-import { getClientMessages } from "@/fake-data"
+import { getClientMessages, sendMessage } from "@/fake-data"
+import { Message } from "../interfaces/chat.interfaces"
 
 export default function ChatPage() {
     const { clientId } = useParams();
-
-    const [input, setInput] = useState("")
+    const queryClient = useQueryClient();
+    const [input, setInput] = useState("");
 
     const { data: messages = [], isLoading } = useQuery({
         queryKey: ["messages", clientId],
         queryFn: () => getClientMessages(clientId ?? ''),
     });
+
+    const { mutate: sendMessageMutation } = useMutation({
+        mutationFn: sendMessage,
+        onSuccess: (newMessage) => {
+            queryClient.setQueryData(
+                ["messages", clientId], 
+                (oldMessages: Message[]) => [...oldMessages, newMessage]
+            );
+        },
+    });
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        sendMessageMutation({
+            clientId: clientId ?? '',
+            content: input,
+            createdAt: new Date(),
+            sender: 'agent',
+        });
+
+        setInput('');
+    }
 
     if (isLoading) {
         return (
@@ -41,7 +65,7 @@ export default function ChatPage() {
                 <div className="space-y-4">
                     {messages.map((message, index) => (
                         <div key={index} className="w-full">
-                            {message.sender === "agent" ? (
+                            {message.sender === "client" ? (
                                 // Agent message - left aligned
                                 <div className="flex gap-2 max-w-[80%]">
                                     <div className="h-8 w-8 rounded-full bg-primary flex-shrink-0" />
@@ -86,18 +110,20 @@ export default function ChatPage() {
                 </div>
             </ScrollArea>
             <div className="p-4 border-t">
-                <div className="flex items-center gap-2">
-                    <Textarea
-                        placeholder="Type a message as a customer"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        className="min-h-[44px] h-[44px] resize-none py-3"
-                    />
-                    <Button className="h-[44px] px-4 flex items-center gap-2">
-                        <Send className="h-4 w-4" />
-                        <span>Send</span>
-                    </Button>
-                </div>
+                <form onSubmit={handleSubmit}>
+                    <div className="flex items-center gap-2">
+                        <Textarea
+                            placeholder="Type a message as a customer"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            className="min-h-[44px] h-[44px] resize-none py-3"
+                        />
+                        <Button className="h-[44px] px-4 flex items-center gap-2">
+                            <Send className="h-4 w-4" />
+                            <span>Send</span>
+                        </Button>
+                    </div>
+                </form>
             </div>
         </div>
     )
