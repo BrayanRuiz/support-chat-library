@@ -9,12 +9,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import placeholderImage from "@/assets/placeholder.svg"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { loginUser } from "@/fake-data"
 
 export function LoginPage({ className, ...props }: React.ComponentProps<"div">) {
 
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const { mutate: loginMutation, isPending } = useMutation({
         mutationFn: loginUser,
@@ -23,6 +24,8 @@ export function LoginPage({ className, ...props }: React.ComponentProps<"div">) 
             localStorage.setItem('token', data.token);
 
             // TODO: Invalidar query del usuario
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+
             navigate('/chat', { replace: true });
         },
     });
